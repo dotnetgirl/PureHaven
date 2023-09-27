@@ -1,7 +1,8 @@
 ﻿using PureHaven.Domain.Commons;
+
 namespace PureHaven.Domain.Entities;
 
-public class CleaningService : Auditable
+public class HomeCleaningInfo : Auditable
 {
     public long EmployeeId { get; set; }
     public string Name { get; set; }

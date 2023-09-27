@@ -1,8 +1,12 @@
-﻿namespace PureHaven.Presentation;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using PureHaven.Presentation.UI;
+
+namespace PureHaven.Presentation;
 public class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        var uI = new UIPresentation();
+        uI.print();
     }
 }

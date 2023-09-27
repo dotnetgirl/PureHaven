@@ -1,112 +1,86 @@
-﻿using PureHaven.Domain.Entities;
-using PureHaven.Service.DTOs.Users;
-using PureHaven.Service.Interfaces;
+﻿using PureHaven.Data.IRepositories;
 using PureHaven.Data.Repositories;
-using PureHaven.Data.IRepositories;
+using PureHaven.Domain.Entities;
+using PureHaven.Service.DTOs.Users;
 using PureHaven.Service.Exceptions;
+using PureHaven.Service.Helpers;
+using PureHaven.Service.Interfaces;
+using PureHaven.Service.Mapper;
 
 namespace PureHaven.Service.Services;
+
 public class UserService : IUserService
 {
     private readonly IRepository<User> userRepository = new Repository<User>();
-    public async Task<UserForResultDto> CreateAsync(UserForCreationDto dto)
+
+    public async Task<Response<UserForResultDto>> CreateAsync(UserForCreationDto dto)
     {
-        var user = (await this.userRepository.SelectAllAsync()).FirstOrDefault(u => u.Email.ToLower() == dto.Email.ToLower());
+        var user = (await this.userRepository.SelectAllAsync())
+            .FirstOrDefault(u => u.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase));
         if (user is not null)
             throw new PureHavenException(400, "User is already exist");
 
-        var person = new User()
+        var entity = Mapper<User>.Map(dto, new User());
+        var result = await userRepository.InsertAsync(entity);
+
+        var mappedUser = Mapper<UserForResultDto>.Map(entity);
+        return new Response<UserForResultDto>
         {
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Email = dto.Email,
-            Password = dto.Password,
-            PhoneNumber = dto.PhoneNumber,
-            CreatedAt = DateTime.UtcNow
+            Data = mappedUser
         };
-
-        var result = await userRepository.InsertAsync(user);
-
-        var mappedUser = new UserForResultDto()
-        {
-            Id = result.Id,
-            FirstName = result.FirstName,
-            LastName = result.LastName,
-            Role = result.Role,
-        };
-
-        return mappedUser;
     }
 
-    public async Task<List<UserForResultDto>> GetAllAsync()
+    public async Task<Response<UserForResultDto>> GetByIdAsync(long id)
     {
-        var users = await this.userRepository.SelectAllAsync();
-        var result = new List<UserForResultDto>();
+        var entity = await this.userRepository.SelectByIdAsync(id)
+            ?? throw new PureHavenException(404, "User is not found");
 
-        foreach (var user in users)
+        var mappedUser = Mapper<UserForResultDto>.Map(entity);
+        return new Response<UserForResultDto>
         {
-            var mappedUser = new UserForResultDto()
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Role = user.Role,
-            };
+            Data = mappedUser
+        };
+    }
+
+    public async Task<Response<bool>> RemoveAsync(long id)
+    {
+        var entity = await this.userRepository.SelectByIdAsync(id)
+            ?? throw new PureHavenException(404, "User is not found");
+
+        return new Response<bool>
+        {
+            Data = await userRepository.DeleteAsync(id)
+        };
+    }
+
+    public async Task<Response<List<UserForResultDto>>> SelectAllAsync()
+    {
+        var entities = await this.userRepository.SelectAllAsync();
+        var result = new List<UserForResultDto>();
+        foreach (var entity in entities)
+        {
+            var mappedUser = Mapper<UserForResultDto>.Map(entity);
             result.Add(mappedUser);
         }
 
-        return result;
+        return new Response<List<UserForResultDto>>
+        {
+            Data = result
+        };
     }
 
-    public async Task<UserForResultDto> GetByIdAsync(long id)
+    public async Task<Response<UserForResultDto>> UpdateAsync(UserForUpdateDto dto)
     {
-        var user = await this.userRepository.SelectByIdAsync(id);
-        if (user is null)
-            throw new PureHavenException(404, "User is not found");
+        var entity = await this.userRepository.SelectByIdAsync(dto.Id)
+            ?? throw new PureHavenException(404, "User is not found");
 
-        var mappedUser = new UserForResultDto()
+        Mapper<User>.Map(dto, entity);
+        await userRepository.UpdateAsync(entity);
+        var result = Mapper<UserForResultDto>.Map(entity);
+
+        return new Response<UserForResultDto>
         {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Role = user.Role,
+            Data = result
         };
-
-        return mappedUser;
-    }
-
-    public async Task<bool> RemoveAsync(long id)
-    {
-        var user = await this.userRepository.SelectByIdAsync(id);
-        if (user is null)
-            throw new PureHavenException(404, "User is not found");
-
-        return await this.userRepository.DeleteAsync(id);
-    }
-
-    public async Task<UserForResultDto> UpdateAsync(UserForUpdateDto dto)
-    {
-        var user = await this.userRepository.SelectByIdAsync(dto.Id);
-        if (user is null)
-            throw new PureHavenException(404, "User is not found");
-
-        var mappedUser = new User()
-        {
-            Id = dto.Id,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            UpdatedAt = DateTime.UtcNow,
-            Role = dto.Role,
-        };
-        await this.userRepository.UpdateAsync(mappedUser);
-
-        var result = new UserForResultDto()
-        {
-            Id = dto.Id,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Role = dto.Role
-        };
-        return result;
     }
 }

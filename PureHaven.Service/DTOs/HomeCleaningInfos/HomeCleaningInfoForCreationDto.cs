@@ -1,7 +1,6 @@
-﻿namespace PureHaven.Service.DTOs.CleaningServices;
-public class CleaningServiceForResultDto
+﻿namespace PureHaven.Service.DTOs.HomeCleaningInfos;
+public class HomeCleaningInfoForCreationDto
 {
-    public long Id { get; set; }
     public long EmployeeId { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }

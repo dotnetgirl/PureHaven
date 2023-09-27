@@ -1,6 +1,10 @@
 ﻿using PureHaven.Domain.Commons;
+
 namespace PureHaven.Domain.Entities;
+
 public class Schedule : Auditable
 {
-    public List<CleaningService> Service { get; set; }
+    public long EmployeeId { get; set; }
+    public long OrderId { get; set; }
+    public List<HomeCleaningInfo> HomeCleaningInfo { get; set; }
 }

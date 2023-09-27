@@ -1,5 +1,4 @@
 ﻿using PureHaven.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace PureHaven.Service.DTOs.Users;
 public class UserForResultDto

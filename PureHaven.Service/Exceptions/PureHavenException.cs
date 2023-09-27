@@ -1,4 +1,5 @@
 ﻿namespace PureHaven.Service.Exceptions;
+
 public class PureHavenException : Exception
 {
     public int StatusCode { get; set; }

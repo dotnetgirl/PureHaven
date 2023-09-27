@@ -1,6 +1,8 @@
 ﻿namespace PureHaven.Service.DTOs.Orders;
+
 public class OrderForUpdateDto
 {
+    public long Id { get; set; }
     public string UserFullName { get; set; }
     public string Email { get; set; }
     public long EmpoleeId { get; set; }

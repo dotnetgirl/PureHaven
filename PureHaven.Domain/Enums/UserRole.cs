@@ -1,4 +1,5 @@
 ﻿namespace PureHaven.Domain.Enums;
+
 public enum UserRole
 {
     User = 1,
@@ -7,5 +8,5 @@ public enum UserRole
     Saller,
     Customer,
     Admin,
-    SuperAdmin,   
+    SuperAdmin
 }

@@ -1,10 +1,8 @@
-﻿using PureHaven.Service.DTOs.Users;
+﻿using PureHaven.Service.DTOs.Schedules;
+using PureHaven.Service.Interfaces.Commons;
+
 namespace PureHaven.Service.Interfaces;
-public interface IScheduleService
+
+public interface IScheduleService : IService<ScheduleForCreationDto, ScheduleForUpdateDto, ScheduleForResultDto>
 {
-    public Task<UserForResultDto> CreateAsync(UserForCreationDto dto);
-    public Task<UserForResultDto> UpdateAsync(UserForUpdateDto dto);
-    public Task<bool> RemoveAsync(long id);
-    public Task<UserForResultDto> GetByIdAsync(long id);
-    public Task<List<UserForResultDto>> GetAllAsync();
 }
